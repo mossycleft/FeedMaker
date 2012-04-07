@@ -4,10 +4,14 @@ require 'csv'
 
 @agent = Mechanize.new
 @date = Time.now.localtime.strftime("%Y-%m-%d")
+# Things to change
+@page_with_links = "http://www.lamuscle.com"
+@product_link = "products/"
+
 
 def main()
-  pull_attrb("http://www.lamuscle.com")
-  
+  @output_csv = CSV.open("Initial_Feed#{@date}.csv", 'w')
+  pull_attrb(@page_with_links) 
 end
 
 def pull_attrb(url)
@@ -19,24 +23,21 @@ def pull_attrb(url)
       puts link.text    
       puts link.uri
       puts "\n"
+      save_attrb(link.text, link.uri)
     else
       puts "Not Product Link"
       puts "\n"
     end
-  end
-  
-  # @output_csv = CSV.open("Feed_URLs_#{@date}.csv", 'w')
-  #   @output_csv << ["URL", "Title", "Description", "Price"]
-  
+  end 
 end
 
 def is_product_link(url)
-  product_link = "products/"
-  not url.to_s.scan(/#{product_link}/i).empty?
+  not url.to_s.scan(/#{@product_link}/i).empty?
 end
 
-def save_attrb(url, title, desc, price)
-  @output_csv << [url, title, desc, price]
+def save_attrb(title, url)
+  full_url = @page_with_links + url.to_s
+  @output_csv << [title, full_url]
   
   
 end
