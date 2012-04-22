@@ -8,23 +8,27 @@ require 'csv'
 
 def main()
   @output_csv = CSV.open("Secondary_Feed#{@date}.csv", 'w')
-  @output_csv << ["Title", "Description", "Link", "Price", "Image Link", "Product ID"]
-  roll_through  
-  
+  @output_csv << ["title", "description", "link", "price", "image link", "id", "product_type", "goole product category", "condition", "brand", "shipping weight", "mpn", "availability"]
+  roll_through
 end
 
 def roll_through
-  product_id = 0
+  product_id_number = 100
   CSV.foreach("Initial_Feed#{@date}.csv", :encoding => 'windows-1251:utf-8') do |row|
-    product_id = product_id + 1    
+    product_id_number += 1 
+    product_id = "HALF#{product_id_number}"
+    mpn = "SPP#{product_id_number}" 
     title = row[0]
     url   = row[1]
     @page = @agent.get(url)
-    pull_price
-    pull_description
-    pull_image_link
-    output(title, product_id, pull_description, url, pull_price, pull_image_link)
-    save_image(pull_image_link, product_id)
+    product_type = "Halfords > Mobility Aids > Mobility Scooters"
+    google_product_category = "Health & Beauty > Health Care > Mobility & Accessibility > Accessibility Equipment > Mobility Scooters"
+    condition = "new"
+    brand = "Halfords"
+    shipping_weight = "10kg" 
+    availability = "in stock"
+    output(title, product_id, pull_description, url, pull_price, pull_image_link, product_type, google_product_category, condition, brand, shipping_weight, mpn, availability)
+    save_image(pull_image_link, product_id, title)
     end
 end
 
@@ -39,7 +43,6 @@ def pull_price
   price  = @page.parser.xpath("(//div[@class='total'])[1]").text
   price = price.strip
   return price
-
 end
 
 def pull_description
@@ -50,19 +53,17 @@ def pull_description
   return description
 end
 
-def output(title, product_id, desc, url, price, image_link)
+def output(title, product_id, desc, url, price, image_link, product_type, google_product_category, condition, brand, shipping_weight, mpn, availability)
   puts "title = "       + title
   puts "Description = " + desc
   puts "URL = "         + url
   puts "Price = "       + price
   puts "Image Link = "  + image_link
-  @output_csv << [title, desc, url, price, image_link]
+  @output_csv << [title, desc, url, price, image_link, product_id, product_type, google_product_category, condition, brand, shipping_weight, mpn, availability]
 end
 
-def save_image(image_link, product_id)
-  @agent.get(image_link).save("images/#{product_id}.jpg")
-  # @agent.get(image_link).class.save  #=> Mechanize::File
-  
+def save_image(image_link, product_id, title)
+  @agent.get(image_link).save("images/#{product_id}_#{title}.jpg")
 end
 
 
