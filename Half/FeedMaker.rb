@@ -5,12 +5,13 @@ require 'csv'
 @agent = Mechanize.new
 @date = Time.now.localtime.strftime("%Y-%m-%d")
 # Things to change
-@page_with_links = "http://www.lamuscle.com"
-@product_link = "products/"
+@domain = "http://www.halfords.com"
+@page_with_links = "http://www.halfords.com/webapp/wcs/stores/servlet/categorydisplay_storeId_10001_catalogId_10151_categoryId_211570_langId_-1"
+@product_link = "productId_"
 
 
 def main()
-  @output_csv = CSV.open("Initial_Feed#{@date}.csv", 'w', :encoding => 'windows-1251:utf-8')
+  @output_csv = CSV.open("Initial_Feed#{@date}.csv", 'w')
   pull_attrb(@page_with_links) 
 end
 
@@ -36,8 +37,9 @@ def is_product_link(url)
 end
 
 def save_attrb(title, url)
-  full_url = @page_with_links + url.to_s
-  @output_csv << [title, full_url]
+  clean_title = title.to_s.gsub(/\A(\s+)/,"")
+  clean_title = clean_title.to_s.gsub(/(\s+)\z/,"")
+  @output_csv << [clean_title, url]
   
   
 end
