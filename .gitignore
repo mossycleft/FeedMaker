@@ -8,7 +8,3 @@ doc/
 *~
 .project
 .DS_Store
-*.csv
-*.jpg
-*.jpeg
-*.gif
